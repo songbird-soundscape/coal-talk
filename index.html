@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Coal Talk</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=VT323&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+:root { --bg: #2a2119; --panel: #352a20; --ink: #efe4d0; --muted: #c2b29a; --line: #4a3c2e; --chip: #40332a; --accent: #d0713a; --gold: #d0a24a; --moss: #8a9a52; --coal: #15110d;
+  --f-pixel: "Silkscreen", monospace; --f-tv: "VT323", ui-monospace, monospace; --f-body: "Atkinson Hyperlegible", system-ui, sans-serif; color-scheme: dark; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #17120d; --panel: #221a13; --ink: #ece2cf; --muted: #ad9f88; --line: #3a2e22; --chip: #2e241b; } }
+:root[data-theme="dark"] { --bg: #17120d; --panel: #221a13; --ink: #ece2cf; --muted: #ad9f88; --line: #3a2e22; --chip: #2e241b; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 var(--f-body); padding: 20px 16px 48px; }
+.wrap { max-width: 1100px; margin: 0 auto; display: grid; gap: 18px; }
+h1 { font: 700 clamp(26px, 5vw, 44px)/1 var(--f-pixel); margin: 0; letter-spacing: 1px; } h1 span { color: var(--accent); }
+h2 { font: 700 15px/1.2 var(--f-pixel); letter-spacing: 1px; margin: 0; text-transform: uppercase; }
+.eyebrow { font: 400 16px/1.1 var(--f-tv); text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+.note { font-size: 14.5px; color: var(--muted); margin: 0; max-width: 78ch; } .note b { color: var(--ink); }
+.cols { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 880px) { .cols { grid-template-columns: 1fr; } }
+/* the television */
+.tv { background: linear-gradient(#5a4632, #3a2c1f); border-radius: 22px; padding: 18px 18px 46px; box-shadow: inset 0 0 0 3px #2a1f15, 0 6px 18px rgba(0,0,0,.3); position: relative; }
+.tv::after { content: "COAL TALK · CH 3"; position: absolute; left: 22px; bottom: 14px; font: 400 17px var(--f-tv); color: #d8c7a6; letter-spacing: 2px; }
+.knobs { position: absolute; right: 22px; bottom: 12px; display: flex; gap: 10px; } .knobs i { width: 20px; height: 20px; border-radius: 50%; background: radial-gradient(#cdbb94, #6e5a3c); display: block; }
+.screen { position: relative; border-radius: 18px / 22px; overflow: hidden; background: #0b0d10; box-shadow: inset 0 0 40px rgba(0,0,0,.8); }
+#tv { display: block; width: 100%; image-rendering: pixelated; }
+.screen::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(0,0,0,.22) 0 2px, transparent 2px 4px); pointer-events: none; z-index: 2; }
+.screen::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.55)); pointer-events: none; z-index: 3; }
+.caption { position: absolute; left: 0; right: 0; bottom: 6%; text-align: center; font: 400 clamp(17px, 2.6vw, 26px)/1.15 var(--f-tv); color: #fff; text-shadow: 2px 2px 0 #000, 0 0 6px rgba(0,0,0,.8); padding: 0 6%; z-index: 4; }
+.qs { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
+.qs button { text-align: left; font: 700 14px var(--f-body); color: var(--ink); background: var(--chip); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; cursor: pointer; }
+.qs button:hover { border-color: var(--accent); } .qs button[aria-pressed="true"] { background: var(--accent); color: #1a120c; border-color: var(--accent); }
+.strands { display: flex; flex-wrap: wrap; gap: 6px; } .strands button { font: 400 20px var(--f-tv); letter-spacing: 1px; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--chip); color: var(--ink); cursor: pointer; } .strands button[aria-pressed="true"] { background: var(--moss); color: #15110d; border-color: var(--moss); }
+.qs button:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.answer { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 10px; }
+.answer h3 { font: 400 26px/1.05 var(--f-tv); margin: 0; letter-spacing: .5px; }
+.answer p { margin: 0; }
+.facts { display: grid; gap: 6px; margin: 0; padding-left: 18px; }
+.btns { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.btns button { font: 700 13.5px var(--f-body); color: var(--ink); background: var(--chip); border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; cursor: pointer; }
+.btns button.go { background: var(--accent); border-color: var(--accent); color: #1a120c; }
+.bench { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: grid; gap: 12px; }
+.bench > header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 12px; }
+.rank { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+@media (max-width: 640px) { .rank { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.rank div { border-radius: 10px; padding: 10px 8px; color: #f4eee1; font-size: 13px; line-height: 1.3; min-height: 112px; display: grid; align-content: space-between; }
+.rank b { font: 400 21px/1 var(--f-tv); display: block; }
+.timeline { position: relative; }
+#cTime { width: 100%; display: block; }
+.tl-read { font-size: 15px; }
+.row { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; align-items: center; }
+.row input[type=range] { grid-column: 1 / -1; width: 100%; accent-color: var(--accent); }
+.val { font: 400 17px var(--f-tv); color: var(--muted); }
+.refs { font-size: 12.5px; color: var(--muted); display: grid; gap: 4px; }
+</style></head><body>
+<div class="wrap">
+  <header style="display:grid;gap:8px">
+    <h1>Coal <span>Talk</span></h1>
+    <p class="note">A public service announcement from 300 million years ago, in three strands: <b>economy &amp; people</b> (national, industrial, ecological and social), <b>peat landscapes</b> (the swamps coal comes from, then and now), and <b>science in the mines</b> (the fossils coal keeps, and why mines should be open to science). Pick a question your kid might ask, and the family on the screen talks it through.</p>
+    <p class="note" id="artCredit" hidden></p>
+  </header>
+
+  <div class="cols">
+    <div class="tv" aria-label="A retro television">
+      <div class="screen"><canvas id="tv" width="960" height="600" aria-label="Pixel scene for the current question"></canvas><div class="caption" id="cap"></div></div>
+      <div class="knobs"><i></i><i></i></div>
+    </div>
+    <div class="answer" aria-live="polite">
+      <div class="eyebrow" id="aEye">Coal Talk</div>
+      <h3 id="aHead">If you don't talk to your kids about coal… who will?</h3>
+      <p id="aBody">Pick a question below. Each one is a short scene and a plain answer you can say out loud at the kitchen table.</p>
+      <ul class="facts" id="aFacts"></ul>
+      <div class="btns"><button class="go" id="prevQ">◀ Previous</button><button class="go" id="nextQ">Next question ▶</button></div>
+    </div>
+  </div>
+
+  <div class="strands" id="strands" role="group" aria-label="Strands"></div>
+  <div class="qs" id="qs" role="group" aria-label="Questions kids ask"></div>
+
+  <section class="bench" aria-labelledby="hRank">
+    <header><h2 id="hRank">From peat to anthracite</h2><span class="eyebrow">deeper, hotter, longer: more carbon</span></header>
+    <div class="rank" id="rank"></div>
+    <p class="note">Carbon percentages are typical values on a dry, ash-free basis; real coals overlap. It takes roughly ten metres of peat to make one metre of bituminous coal, though estimates run from about five to over twenty.</p>
+  </section>
+
+  <section class="bench" aria-labelledby="hTime">
+    <header><h2 id="hTime">Coal through time</h2><span class="eyebrow">drag through 359 million years</span></header>
+    <canvas id="cTime" height="120" aria-label="A timeline from the Carboniferous to today, with coal events marked"></canvas>
+    <div class="row"><label for="tl">When</label><span class="val" id="tlV"></span><input id="tl" type="range" min="0" max="1000" value="0"></div>
+    <p class="tl-read" id="tlRead"></p>
+  </section>
+
+  <div class="refs">
+    <div>Sources: Phillips &amp; DiMichele (1992), Comparative ecology and life-history biology of arborescent lycopsids in Late Carboniferous swamps of Euramerica, <i>Ann. Missouri Bot. Gard.</i> 79:560. Nelsen et al. (2016), Delayed fungal evolution did not cause the Paleozoic peak in coal production, <i>PNAS</i> 113:2442. Joy, Willis &amp; Lacey (1956), A rapid cellulose peel technique in palaeobotany, <i>Ann. Bot.</i> 20:635. Frick et al. (2010), An emerging disease causes regional population collapse of a common North American bat species, <i>Science</i> 329:679. Scott &amp; Rex (1985), The formation and significance of Carboniferous coal balls, <i>Phil. Trans. R. Soc. B</i> 311:123. US EPA emission factors for greenhouse gas inventories (coal about 1.7 times the CO₂ of natural gas per unit of heat). US Energy Information Administration (US coal production peaked in 2008). DiMichele et al. (2007), Ecological gradients within a Pennsylvanian mire forest, <i>Geology</i> 35:415. Dargie et al. (2017), Age, extent and carbon storage of the central Congo Basin peatland complex, <i>Nature</i> 542:86. UK Met Office and Bell &amp; Davis (2001), <i>Environ. Health Perspect.</i> 109 (Suppl. 3):389, on the deaths of the 1952 London smog.</div>
+  </div>
+</div>
+
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id), tok = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+// ================= the questions =================
+const Q = [
+  { strand: 'peat', q: 'Where does coal come from?', scene: 'swamp', cap: '300 MILLION YEARS AGO…',
+    head: 'From swamp forests, 300 million years ago.',
+    body: 'Long before dinosaurs, huge swamps covered the warm, wet middle of a supercontinent. Their trees didn\'t rot away: they fell into water so soggy and sour that the wood piled up as peat, layer on layer. Buried deep for millions of years, that peat slowly turned into coal.',
+    facts: ['Most of the coal mined in Europe and eastern North America is from the Carboniferous, 359 to 299 million years ago.', 'The biggest trees were lycopsids, giant relatives of today\'s little club mosses, 30 metres tall and more, with diamond-patterned bark.', 'Alongside them grew giant horsetails (calamites), tree ferns, and cordaites, tall early relatives of conifers.'] },
+  { strand: 'peat', q: 'How does a swamp turn into stone that burns?', scene: 'bury', cap: 'PRESSURE. HEAT. TIME.',
+    head: 'Buried, squeezed and slowly cooked.',
+    body: 'Sand and mud washed over the peat and buried it. The deeper it went, the hotter and more squeezed it got. Water and gases were driven out, and what was left became richer and richer in carbon: first brown lignite, then black bituminous coal, and with enough heat, shiny anthracite.',
+    facts: ['Roughly ten metres of peat makes one metre of coal.', 'The deeper and hotter, the higher the "rank": more carbon and more heat when it burns.', 'Anthracite in Pennsylvania was cooked extra hot when the Appalachian Mountains were pushed up.'] },
+  { strand: 'sci', q: 'What\'s a coal ball?', scene: 'coalball', cap: 'A SWAMP, FROZEN IN STONE.',
+    head: 'A lump of the ancient swamp, turned to rock before it became coal.',
+    body: 'In some coal seams, minerals (mostly calcite) seeped into the peat and hardened it into round lumps before it could be squashed. Inside, the roots, leaves, seeds and even single cells of the swamp plants are preserved in three dimensions. Scientists slice them, etch them in acid, and peel off thin films to see the plants under a microscope.',
+    facts: ['Coal balls are found in Pennsylvanian coals of the US Midwest, including Illinois, Iowa, Kansas, Indiana and eastern Ohio, and in England and Europe.', 'They are how we know what the coal swamps actually looked like, plant by plant.', 'The peel technique: cut, polish, etch with acid, pour on acetone, lay on acetate film, and peel off a slice one cell thick.'] },
+  { strand: 'peat', q: 'Why was there so much coal back then?', scene: 'pangaea', cap: 'WET. WARM. SINKING.',
+    head: 'The right place, the right climate, and land that kept sinking.',
+    body: 'When the continents crashed together into Pangaea, broad lowlands along the equator stayed wet all year and slowly sank, so swamps could keep piling up peat for thousands of years before being buried. An older idea was that fungi hadn\'t yet learned to break down wood, so it piled up; that\'s now doubted, because wood-rotting fungi were probably already around, and the climate and the sinking land explain it better.',
+    facts: ['Rising and falling seas made repeated layers of coal, shale and limestone, called cyclothems.', 'The swamps came and went with ice ages near the South Pole.', 'The lignin and fungi idea: still debated, but most researchers now point to climate and tectonics.'] },
+  { strand: 'econ', q: 'Who dug it up?', scene: 'miners', cap: 'DOWN IN THE MINE.',
+    head: 'Miners: men, and once, children too.',
+    body: 'Coal powered the Industrial Revolution, and people dug it by hand, deep underground, by lamplight. In the 1800s, children worked in mines too: hauling carts, opening doors, and sorting coal as "breaker boys". Miners fought for safer work and fair pay, sometimes in pitched battles, and for laws against the black lung disease that coal dust causes.',
+    facts: ['Britain banned women and children under ten from working underground in 1842.', 'In 1921, about 10,000 armed miners marched at Blair Mountain, West Virginia: the largest labour uprising in US history.', 'The US Federal Coal Mine Health and Safety Act of 1969 set dust limits and black lung benefits.'] },
+  { strand: 'econ', q: 'What happened when we burned it?', scene: 'smog', cap: 'THE BIG SMOKE.',
+    head: 'Smoke, smog, acid rain, and carbon dioxide.',
+    body: 'Burning coal makes heat and electricity, and smoke. In 1306 a royal proclamation already tried to stop people burning "sea coal" in London. In December 1952, a smog of coal smoke sat over London for five days, and thousands died. Clean air laws followed. But all coal also makes carbon dioxide, which warms the planet, and coal makes more of it for the same heat than oil or gas.',
+    facts: ['The 1952 London smog killed about 4,000 people at the time; later estimates run to 12,000.', 'Coal gives about 1.7 times the CO₂ of natural gas for the same amount of heat.', 'Coal is the largest single source of the world\'s fossil-fuel CO₂, roughly two-fifths.'] },
+  { strand: 'econ', q: 'Is coal going away?', scene: 'plant', cap: 'THE LAST SHIFT?',
+    head: 'In some places, yes. Worldwide, not yet.',
+    body: 'In the United States, coal production peaked in 2008 and has fallen since, as power plants switched to natural gas, wind and sun. Many countries still burn a lot of coal, and some are building more. Where mines and plants close, whole towns that depended on them need help to find new work: people call this a "just transition".',
+    facts: ['US coal production peaked in 2008 at about 1.17 billion short tons.', 'The UK closed its last coal power station in 2024, after 142 years of coal power.', 'Coal towns have the most to lose and the most to teach about how a change is done fairly.'] },
+  { strand: 'peat', q: 'Do peat swamps still exist?', scene: 'peatnow', cap: 'STILL GROWING TODAY.',
+    head: 'Yes, and they still store huge amounts of carbon.',
+    body: 'Peat is still forming in bogs and fens in the cool north, and in tropical peat swamp forests in Southeast Asia, the Congo Basin and the Amazon. Peatlands cover only about three percent of the land but hold roughly a third of all the carbon in the world\'s soils. When they are drained or burned, that carbon goes into the air; kept wet, they keep it.',
+    facts: ['The huge peatlands of the central Congo Basin were mapped only in 2017.', 'Drained and burning tropical peat is a major source of carbon dioxide in dry years.', 'Today\'s peat swamps are living models for the coal swamps of the past: palynologists compare their pollen and spores with fossil ones.'] },
+  { strand: 'sci', q: 'Can you find fossils in a coal mine?', scene: 'roof', cap: 'A FOREST ON THE CEILING.',
+    head: 'Whole forests, standing where they grew.',
+    body: 'When a coal swamp was suddenly buried by mud, the trees were preserved where they stood. Miners digging out the coal underneath sometimes find the stumps and fallen trunks in the mine roof, a fossil forest seen from below. In one Illinois mine, scientists mapped a forest like this across several kilometres, tree by tree.',
+    facts: ['Upright fossil stumps in mine roofs are a real hazard to miners ("kettle bottoms" can fall), and a treasure to science.', 'Spores and pollen in the coal itself tell which plants grew there, seam by seam.', 'Most of what we know about the coal swamps came from mines, coal balls and road cuts.'] },
+  { strand: 'sci', q: 'Why open the mines to science?', scene: 'roof', cap: 'OPEN THE MINES TO SCIENCE!',
+    head: 'Because every working face is a page of Earth\'s history, and it\'s gone once it\'s mined.',
+    body: 'Mines expose layers no one would ever dig for research alone. With a little time and access, scientists can log fossil forests, collect coal balls and sample spores before the face is mined away or sealed. Some mining companies and geological surveys already work this way; it could be routine.',
+    facts: ['A short visit by a palaeobotanist can record what is in a mine roof before it\'s gone.', 'Coal-ball collections from mines of the 1900s are still studied today.', 'Closed mines can become underground labs, too.'] },
+  { strand: 'sci', q: 'Could an old mine be a science park?', scene: 'shaft', cap: 'COOL IN SUMMER. OPEN TO ALL.',
+    head: 'Yes: huge halls that stay cool all summer, with Earth\'s history on the walls.',
+    body: 'A few tens of metres underground, the rock stays close to the year\'s average temperature, cool in the hottest heat wave and above freezing in winter. Old room-and-pillar mines leave enormous halls: room for a public cooling refuge on scorching days, a museum, a climbing gym and a working laboratory all at once. Stratigraphers could chip the walls back a little each season to reveal fresh rock and fossils; visitors could rappel down a shaft past 300 million years and climb their way out, and riders going down over a pulley could lift someone else up, no motor needed. But someone may already live there: old mines are among the most important places bats spend the winter. Any building has to fit the life already present, so the first step is a survey, and bat roosts get their own quiet, closed-off halls to be watched respectfully, from a distance.',
+    facts: ['Bats hibernate in old mines by the thousands. Waking them in winter burns fat they need to survive, and white-nose syndrome has already killed millions, so roosts are left in peace.', 'Instead of sealing old mines shut, bat gates (open steel grilles) keep people out and let bats fly through.', 'In Louisville, Kentucky, an old limestone mine stays about 14 °C (58 °F) all year and is open for tours, a ropes course and a bike park.', 'Under Kansas City, a former limestone mine holds warehouses and offices that need little heating or cooling.', 'Shallow mines stay cool; deep ones don\'t: rock warms about 2.5 to 3 °C for every 100 metres down.', 'Safety comes first: ventilation, roof support, water control and two ways out, before anyone visits.'] },
+  { strand: 'econ', q: 'What do we do with the old mines?', scene: 'datacenter', cap: 'COOL WATER, DEEP DOWN.',
+    head: 'Flooded mines hold warm water, and stay cool underground.',
+    body: 'Old mines fill with groundwater that stays at a steady temperature all year. Towns are starting to use it: heat pumps pull warmth from mine water to heat homes in winter, and send heat back down in summer. Deep, cool mines have also been turned into data centres, which need lots of cooling. Done carefully, the holes that coal left could help replace it.',
+    facts: ['In Heerlen, in the Netherlands, an old coal-mine network now heats and cools buildings.', 'Gateshead, in north-east England, opened a mine-water heat network in 2023.', 'In Norway, a data centre runs inside a former mine, cooled by fjord water.'] },
+  { strand: 'econ', q: 'What can we do?', scene: 'family', cap: 'NOW YOU KNOW.',
+    head: 'Talk about it, and look closer.',
+    body: 'Coal is a fossil, a whole forest\'s worth of sunlight stored in stone. Use less of what burns it, and remember the people and places that dug it. And next time you see a lump of coal, look closely: you might see the bark of a 300-million-year-old tree.',
+    facts: ['Visit a natural history museum with coal-age fossils, or a coal-mining heritage site.', 'Look for plant fossils in shale near old mines and road cuts (with permission, and safely).', 'Ask what powers your town\'s electricity.'] },
+];
+let QI = -1, t0 = performance.now();
+const STRANDS = [['all', 'All'], ['econ', 'Economy & people'], ['peat', 'Peat landscapes'], ['sci', 'Science in the mines']]; let STR = 'all';
+function listQs() { $('qs').innerHTML = Q.map((x, i) => STR === 'all' || x.strand === STR ? `<button data-i="${i}" aria-pressed="${i === QI}">${x.q}</button>` : '').join(''); }
+$('strands').innerHTML = STRANDS.map(([k, n]) => `<button data-s="${k}" aria-pressed="${k === STR}">${n}</button>`).join('');
+$('strands').addEventListener('click', e => { const b = e.target.closest('[data-s]'); if (!b) return; STR = b.dataset.s; [...$('strands').children].forEach(x => x.setAttribute('aria-pressed', x.dataset.s === STR)); listQs(); });
+listQs();
+$('qs').addEventListener('click', e => { const b = e.target.closest('[data-i]'); if (b) show(+b.dataset.i); });
+$('nextQ').onclick = () => show((QI + 1) % Q.length); $('prevQ').onclick = () => show((QI - 1 + Q.length) % Q.length);
+function show(i) {
+  QI = i; t0 = performance.now(); const x = Q[i];
+  listQs();
+  $('aEye').textContent = `Question ${i + 1} of ${Q.length}`; $('aHead').textContent = x.head; $('aBody').textContent = x.body;
+  $('aFacts').innerHTML = x.facts.map(f => `<li>${f}</li>`).join('');
+}
+
+// ================= the TV scenes =================
+const off = document.createElement('canvas'); off.width = 160; off.height = 100; const g = off.getContext('2d');
+const px = (x, y, c, w = 1, h = 1) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), w, h); };
+const SKIN = '#e0ac7d', SKIN2 = '#9c6b46';
+function person(x, y, shirt, hair, kid) { const s = kid ? 0.75 : 1, h = Math.round(9 * s), b = Math.round(12 * s);
+  px(x, y, hair, 6, 2); px(x, y + 2, SKIN, 6, h - 2); px(x + 1, y + 4, '#222'); px(x + 4, y + 4, '#222'); px(x + 2, y + h - 2, '#a0523c', 2, 1);
+  px(x - 1, y + h, shirt, 8, b); }
+function kitchen(t) {
+  px(0, 0, '#c9a46a', 160, 100); for (let x = 0; x < 160; x += 10) px(x, 0, '#bf9a5f', 5, 70);     // wallpaper stripes
+  px(0, 70, '#7a5a3a', 160, 30); px(98, 8, '#e8e0c8', 34, 26); px(100, 10, '#7fb0d8', 30, 22); px(114, 10, '#e8e0c8', 2, 22); px(100, 20, '#e8e0c8', 30, 2);   // window
+  px(76, 0, '#333', 1, 14); px(70, 14, '#f2d36b', 13, 5); g.fillStyle = 'rgba(255,230,140,0.12)'; g.beginPath(); g.moveTo(70, 19); g.lineTo(40, 70); g.lineTo(112, 70); g.lineTo(83, 19); g.fill();   // lamp
+  person(46, 38, '#3b6ea5', '#3b2a20'); person(100, 44, '#d0583a', '#6b4a2e', true);                 // parent and kid
+  px(30, 62, '#8a5a2a', 100, 5); px(34, 67, '#6b4422', 3, 18); px(124, 67, '#6b4422', 3, 18);        // table
+  const lump = (x, y) => { px(x, y, '#1a1816', 7, 5); px(x + 1, y - 1, '#2a2622', 5, 1); px(x + 2, y + 1, '#55524a'); px(x + 4, y + 2, '#6a665c'); };
+  lump(74, 57); if (Math.floor(t / 400) % 2) { px(78, 55, '#ffffff'); }                               // a glint on the coal
+  px(56, 58, '#f4f0e6', 6, 4); px(57, 56, '#8a5a2a', 4, 2);                                            // a mug
+}
+function lyco(x, base, h, t) {                                  // a lycopsid: tall trunk with diamond leaf scars, a forked crown
+  px(x, base - h, '#5a4a32', 4, h); for (let y = base - h + 3; y < base - 2; y += 4) { px(x + ((y / 4) % 2 ? 1 : 2), y, '#3e3222', 1, 2); }
+  const sway = Math.sin(t / 1400 + x) * 0.8, cy = base - h;
+  for (let k = -1; k <= 1; k += 2) { for (let j = 0; j < 7; j++) px(x + 1 + k * j + sway, cy - j, '#4f7a35', 2, 1); for (let j = 0; j < 5; j++) px(x + 1 + k * (6 + j) + sway, cy - 7 + j * 0.3, '#5f8f3a', 1, 3); }
+}
+function calamite(x, base, h) { px(x, base - h, '#6f8a3a', 2, h); for (let y = base - h; y < base; y += 5) { px(x - 2, y, '#4f6a2a', 6, 1); } }
+function fern(x, base) { px(x, base - 18, '#5a4a32', 2, 18); for (let k = 0; k < 8; k++) { const a = k / 8 * Math.PI * 2; for (let j = 1; j < 8; j++) px(x + Math.cos(a) * j, base - 19 + Math.sin(a) * j * 0.5, '#3f7a3a'); } }
+function swamp(t) {
+  px(0, 0, '#7da4a0', 160, 60); px(0, 30, '#93b4a2', 160, 30);
+  for (let x = 0; x < 160; x += 3) px(x, 52 - ((x * 37) % 9), '#6a8f72', 3, 9);
+  px(0, 64, '#2f4a3a', 160, 36); for (let x = 0; x < 160; x += 4) px(x + (Math.floor(t / 300) % 2), 66 + (x % 3) * 8, '#3f5f4a', 3, 1);   // dark water
+  lyco(14, 72, 54, t); lyco(52, 74, 62, t); lyco(118, 72, 50, t); calamite(36, 70, 30); calamite(92, 72, 34); calamite(138, 70, 28); fern(78, 72); fern(150, 74);
+  for (let k = 0; k < 6; k++) { const x = (t / 30 + k * 31) % 170 - 5, y = 26 + Math.sin(t / 200 + k) * 3; px(x, y, '#2a3a2a', 3, 1); px(x + 1, y - 1, '#7fb0a0'); }   // giant dragonflies
+  px(20, 80, '#5a4a32', 30, 3); px(96, 86, '#5a4a32', 24, 3);                                          // fallen logs in the water
+}
+function bury(t) {
+  const u = (t % 9000) / 9000, layers = [['peat', '#5a4228'], ['mud', '#8a7a62'], ['sand', '#c9b48a'], ['shale', '#6a6a6a'], ['limestone', '#b8b8a8']];
+  px(0, 0, '#7da4a0', 160, 100); const top = 20 - u * 6; let y = top;
+  for (let k = layers.length - 1; k >= 0; k--) { const th = k === 0 ? 14 - u * 9 : 10 + k; if (k <= Math.floor(u * 6) || k === 0) { px(0, y, layers[k][1], 160, th); y += th; } }
+  px(0, y, '#3a332a', 160, 100 - y);
+  const coal = u > 0.55, c = coal ? (u > 0.85 ? '#141312' : '#26231f') : '#5a4228'; px(0, 78, c, 160, 8 - u * 4);
+  g.fillStyle = '#ff6a2a'; g.globalAlpha = 0.2 + 0.25 * u; g.fillRect(0, 88, 160, 12); g.globalAlpha = 1;   // heat below
+  for (let k = 0; k < 5; k++) { const x = 20 + k * 30, yy = 74 - ((t / 20 + k * 13) % 50); px(x, yy, 'rgba(255,255,255,0.5)', 1, 2); }   // water and gas squeezed out
+  g.fillStyle = '#fff'; g.font = '7px Silkscreen, monospace'; g.fillText(u < 0.3 ? 'PEAT' : u < 0.55 ? 'LIGNITE' : u < 0.85 ? 'BITUMINOUS' : 'ANTHRACITE', 6, 96);
+}
+function coalball(t) {
+  px(0, 0, '#2a2622', 160, 100); for (let x = 0; x < 160; x += 2) for (let y = 0; y < 100; y += 3) if ((x * 7 + y * 3) % 11 === 0) px(x, y, '#3a352f');
+  const cx = 80, cy = 50, R = 34 + Math.sin(t / 900) * 0.5;
+  for (let y = -R; y <= R; y++) for (let x = -R; x <= R; x++) { const d = (x * x) / (R * R) + (y * y) / (R * R * 0.8); if (d > 1) continue;
+    const ring = Math.floor(Math.hypot(x, y * 1.1) / 4); px(cx + x, cy + y, ring % 2 ? '#8a7a5e' : '#9a8a6a'); }
+  // preserved plant parts in section: a stem with tissue rings, root cells, a seed
+  for (let a = 0; a < 6.28; a += 0.12) { px(cx - 10 + Math.cos(a) * 9, cy - 4 + Math.sin(a) * 9, '#4a3a22'); px(cx - 10 + Math.cos(a) * 5, cy - 4 + Math.sin(a) * 5, '#5a4a2a'); }
+  px(cx - 11, cy - 5, '#3a2a1a', 3, 3);
+  for (let k = 0; k < 18; k++) { const x = cx + 6 + (k % 6) * 3, y = cy + 8 + Math.floor(k / 6) * 3; px(x, y, '#6a5432', 2, 2); }
+  px(cx + 12, cy - 16, '#4a3a22', 6, 9); px(cx + 13, cy - 15, '#a08a5a', 4, 7);
+  const sw = (t % 6000) / 6000 * 160; g.fillStyle = 'rgba(255,255,255,0.08)'; g.fillRect(sw - 20, 0, 12, 100);   // a peel lifting light across it
+}
+function pangaea(t) {
+  px(0, 0, '#1f4a7a', 160, 100); for (let k = 0; k < 40; k++) px((k * 47) % 160, (k * 23) % 100, '#2a5a8a', 2, 1);
+  g.fillStyle = '#9a8a5a'; g.beginPath(); const pts = [[40, 18], [74, 10], [104, 20], [116, 40], [106, 62], [92, 84], [66, 90], [48, 74], [38, 52], [30, 34]]; pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.closePath(); g.fill();
+  g.strokeStyle = '#ffd866'; g.setLineDash([2, 2]); g.beginPath(); g.moveTo(0, 50); g.lineTo(160, 50); g.stroke(); g.setLineDash([]);
+  for (let k = 0; k < 14; k++) { const x = 46 + k * 4.5, y = 46 + Math.sin(k) * 4; px(x, y, Math.floor(t / 500 + k) % 3 ? '#2f6a2a' : '#3f8a3a', 4, 4); }   // equatorial swamps
+  px(60, 86, '#e8f2f8', 22, 6); px(64, 84, '#e8f2f8', 14, 2);                                           // southern ice
+  g.fillStyle = '#fff'; g.font = '7px Silkscreen, monospace'; g.fillText('EQUATOR', 122, 47);
+}
+function miners(t) {
+  px(0, 0, '#151310', 160, 100); px(0, 78, '#2a241c', 160, 22);
+  for (let x = 10; x < 160; x += 46) { px(x, 18, '#6b4a2e', 4, 60); px(x - 6, 16, '#6b4a2e', 16, 4); }   // timber props
+  px(0, 0, '#26231f', 160, 16); for (let k = 0; k < 30; k++) px((k * 37) % 160, 4 + (k * 11) % 10, '#3a352f', 4, 2);
+  const lamp = (x, y) => { g.fillStyle = 'rgba(255,220,140,0.18)'; g.beginPath(); g.moveTo(x + 3, y + 1); g.lineTo(x + 40, y - 10); g.lineTo(x + 40, y + 24); g.fill(); px(x + 2, y, '#ffe9a0', 2, 2); };
+  const sw = Math.floor(t / 250) % 2;
+  person(40, 50, '#4a4a52', '#2a2a2a'); px(40, 48, '#3a3a3a', 6, 2); lamp(42, 48); px(48, 56 + sw, '#8a8a8a', 10, 1); px(56, 52 + sw, '#8a8a8a', 2, 6);   // a miner with a pick
+  person(100, 56, '#5a4a3a', '#3b2a20', true); px(100, 54, '#3a3a3a', 5, 2);                          // a breaker boy
+  px(112, 70, '#3a3026', 22, 8); px(114, 78, '#111', 4, 4); px(128, 78, '#111', 4, 4); for (let k = 0; k < 8; k++) px(114 + k * 2.5, 66 + (k % 2), '#1a1816', 2, 2);   // a coal cart
+}
+function smog(t) {
+  const fog = 0.55 + 0.25 * Math.sin(t / 3000);
+  px(0, 0, '#8a8670', 160, 100);
+  for (let k = 0; k < 9; k++) { const x = k * 18, h = 30 + (k * 13) % 25; px(x, 80 - h, '#3a3630', 16, h); for (let w = 0; w < 4; w++) px(x + 3 + (w % 2) * 6, 84 - h + Math.floor(w / 2) * 8, Math.floor(t / 700 + k + w) % 3 ? '#e8c860' : '#5a5650', 3, 3); }
+  for (let k = 0; k < 4; k++) { const x = 18 + k * 38; px(x, 20, '#4a3a30', 4, 30); for (let j = 0; j < 12; j++) { const yy = 18 - j * 3, xx = x + 2 + Math.sin(t / 400 + j + k) * j * 0.6 + j * 0.8; g.fillStyle = `rgba(40,36,30,${0.6 - j * 0.04})`; g.fillRect(xx - j * 0.4, yy, 3 + j * 0.6, 3); } }
+  px(0, 80, '#4a463e', 160, 20);
+  g.fillStyle = `rgba(180,172,140,${fog})`; g.fillRect(0, 0, 160, 100);
+  px(72, 72, '#c4b06a', 4, 10); px(70, 70, '#e8e0a0', 8, 3);                                         // a street lamp, barely visible
+}
+function plant(t) {
+  px(0, 0, '#a9c9e0', 160, 60); px(0, 60, '#6f8f5a', 160, 40);
+  px(20, 30, '#7a7a7a', 40, 30); px(26, 10, '#5a5a5a', 8, 20); px(42, 14, '#5a5a5a', 8, 16);              // an old plant, quiet now
+  g.fillStyle = 'rgba(255,255,255,0.4)'; if (Math.floor(t / 1500) % 2) g.fillText('CLOSED', 22, 46);
+  for (let k = 0; k < 3; k++) { const x = 92 + k * 22, a = t / 300 + k; px(x, 24, '#e8e8e8', 2, 40); for (let b = 0; b < 3; b++) { const ang = a + b * 2.094; for (let j = 0; j < 10; j++) px(x + 1 + Math.cos(ang) * j, 24 + Math.sin(ang) * j, '#f4f4f4'); } }   // wind turbines
+  for (let k = 0; k < 4; k++) { px(20 + k * 14, 78, '#2a3a5a', 12, 6); px(21 + k * 14, 79, '#4a6a9a', 10, 1); }   // solar panels
+  person(70, 66, '#3b6ea5', '#3b2a20'); person(82, 70, '#d0583a', '#6b4a2e', true);
+}
+// the opening: a 1950s public service film, in black and white, with grain, scratches and flicker
+function star(x, y, R, col) { g.fillStyle = col; g.beginPath(); for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5, r = k % 2 ? R * 0.42 : R; k ? g.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r) : g.moveTo(x + Math.cos(a) * r, y + Math.sin(a) * r); } g.closePath(); g.fill(); }
+const FILM_LEN = 17000;
+function filmCap(t) { const p = t % FILM_LEN; return p < 3200 ? '' : p < 6200 ? '' : p < 8600 ? 'Jimmy has a question for Father…' : p < 11200 ? '…and it\'s about COAL.' : ''; }
+function title(t) {
+  const p = t % FILM_LEN, G = v => `rgb(${v},${v},${v})`;
+  if (p < 3200) {                                               // the countdown leader: 3, 2, 1
+    const n = 3 - Math.floor(p / 1067), f = (p % 1067) / 1067; px(0, 0, G(150), 160, 100);
+    g.fillStyle = G(95); g.beginPath(); g.moveTo(80, 50); g.arc(80, 50, 70, -Math.PI / 2, -Math.PI / 2 + f * 2 * Math.PI); g.fill();
+    g.strokeStyle = G(235); g.lineWidth = 1.5; [30, 38].forEach(r => { g.beginPath(); g.arc(80, 50, r, 0, 2 * Math.PI); g.stroke(); });
+    px(0, 50, G(235), 160, 1); px(80, 0, G(235), 1, 100);
+    g.fillStyle = G(250); g.font = '700 38px Silkscreen, monospace'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(String(n), 81, 52); g.textBaseline = 'alphabetic';
+  } else if (p < 6200) {                                        // the title card of the film
+    px(0, 0, G(28), 160, 100); g.strokeStyle = G(200); g.lineWidth = 1; g.strokeRect(10, 12, 140, 76); g.strokeRect(13, 15, 134, 70);
+    g.fillStyle = G(220); g.textAlign = 'center'; g.font = '700 6px Silkscreen, monospace'; g.fillText('A  PUBLIC  SERVICE  FILM', 80, 32);
+    g.font = '700 6px Silkscreen, monospace'; g.fillText('FOR  THE  MODERN  FAMILY', 80, 74);
+    g.font = '700 13px Silkscreen, monospace'; g.fillStyle = G(250); g.fillText('COAL', 80, 52); g.font = '700 7px Silkscreen, monospace'; g.fillText('AND  YOU', 80, 62);
+    star(80, 22, 4, G(200));
+  } else if (p < 11200) {                                       // the living room: Father with his pipe, Mother in her apron, Jimmy on the rug, and the lump of coal
+    px(0, 0, G(170), 160, 100); for (let x = 0; x < 160; x += 8) px(x, 0, G(160), 4, 66);   // striped wallpaper
+    px(0, 66, G(110), 160, 34); for (let x = 0; x < 160; x += 12) px(x, 66, G(100), 1, 34);   // floorboards
+    px(114, 30, G(60), 26, 24); px(117, 33, G(200), 20, 15); px(124, 54, G(60), 3, 12);          // the television set
+    px(16, 36, G(80), 30, 22); px(14, 34, G(90), 34, 6); px(16, 58, G(60), 3, 8); px(43, 58, G(60), 3, 8);   // armchair
+    const fa = (x, y) => { px(x + 1, y, G(40), 6, 2); px(x + 1, y + 2, G(200), 6, 7); px(x + 2, y + 4, G(20)); px(x + 5, y + 4, G(20)); px(x + 7, y + 6, G(60), 3, 1); px(x + 9, y + 4, G(90), 1, 2);   // hair, face, pipe
+      px(x, y + 9, G(55), 8, 13); px(x + 3, y + 9, G(220), 2, 6); px(x + 3, y + 10, G(30), 2, 4); px(x + 1, y + 22, G(45), 2, 10); px(x + 5, y + 22, G(45), 2, 10); };   // suit, shirt, tie, trousers
+    fa(26, 26);
+    const pipeSmoke = Math.floor(p / 200); for (let k = 0; k < 6; k++) px(36 + Math.sin(pipeSmoke / 2 + k) * 1.5, 28 - k * 3, `rgba(230,230,230,${0.5 - k * 0.07})`, 1, 2);
+    const mo = (x, y) => { px(x, y, G(70), 8, 4); px(x + 1, y + 3, G(205), 6, 6); px(x + 2, y + 5, G(20)); px(x + 5, y + 5, G(20)); px(x + 3, y + 7, G(90), 2, 1);
+      px(x, y + 9, G(120), 8, 7); px(x - 2, y + 16, G(120), 12, 8); px(x + 1, y + 11, G(235), 6, 11); px(x + 1, y + 24, G(60), 2, 6); px(x + 5, y + 24, G(60), 2, 6); };   // dress and apron
+    mo(92, 34);
+    px(66, 56, G(80), 26, 3); px(68, 59, G(60), 2, 7); px(88, 59, G(60), 2, 7);                    // coffee table
+    const glow = 0.3 + 0.25 * Math.sin(p / 180);                                                    // the lump of coal, glowing ominously
+    g.fillStyle = `rgba(255,255,255,${glow})`; g.beginPath(); g.arc(79, 53, 9, 0, 2 * Math.PI); g.fill();
+    px(75, 50, G(15), 8, 6); px(76, 49, G(30), 6, 1); px(78, 51, G(90));
+    px(62, 64, G(30), 6, 2); px(62, 66, G(205), 6, 5); px(63, 68, G(20)); px(66, 68, G(20)); px(61, 71, G(170), 8, 7); px(61, 78, G(70), 3, 4); px(66, 78, G(70), 3, 4);   // Jimmy, crew cut, on the rug
+    px(52, 82, G(140), 40, 8);
+  } else {                                                     // the big title
+    px(0, 0, G(18), 160, 100);
+    for (let k = 0; k < 9; k++) { const a = -Math.PI / 2 + (k - 4) * 0.22 + Math.sin(p / 900) * 0.02; g.strokeStyle = G(50); g.lineWidth = 6; g.beginPath(); g.moveTo(80, 110); g.lineTo(80 + Math.cos(a) * 200, 110 + Math.sin(a) * 200); g.stroke(); }   // searchlight rays
+    g.textAlign = 'center'; g.fillStyle = G(235); g.font = '700 8px Silkscreen, monospace';
+    g.fillText('IF YOU DON\'T TALK', 80, 22); g.fillText('TO YOUR KIDS', 80, 33); g.fillText('ABOUT', 80, 44);
+    g.font = '700 16px Silkscreen, monospace'; g.fillStyle = G(255); g.fillText('COAL…', 80, 62);
+    const pop = 1 + 0.06 * Math.sin(p / 120); g.save(); g.translate(80, 86); g.scale(pop, pop); g.font = '700 13px Silkscreen, monospace'; g.fillText('WHO WILL?', 0, 0); g.restore();
+  }
+  // film: grain, scratches, a flickering exposure, and a gate weave
+  for (let k = 0; k < 160; k++) { const v = Math.random() < 0.5 ? 255 : 0; g.fillStyle = `rgba(${v},${v},${v},0.18)`; g.fillRect(Math.random() * 160, Math.random() * 100, 1, 1); }
+  if (Math.random() < 0.35) { const x = Math.random() * 160; g.fillStyle = 'rgba(255,255,255,0.35)'; g.fillRect(x, 0, 1, 100); }
+  if (Math.random() < 0.08) { g.fillStyle = 'rgba(0,0,0,0.5)'; g.beginPath(); g.arc(Math.random() * 160, Math.random() * 100, 1 + Math.random() * 2, 0, 2 * Math.PI); g.fill(); }
+  g.fillStyle = `rgba(0,0,0,${0.06 + Math.random() * 0.08})`; g.fillRect(0, 0, 160, 100);
+  g.textAlign = 'left';
+}
+function peatnow(t) {
+  px(0, 0, '#9ab0a0', 160, 55); px(0, 55, '#4a5a3a', 160, 45);
+  for (let x = 0; x < 160; x += 2) { const h = 6 + ((x * 31) % 7); px(x, 62 - h, x % 4 ? '#6f8a4a' : '#8a9a52', 1, h); }     // sedges
+  for (let k = 0; k < 7; k++) { const x = 8 + k * 23, h = 26 + (k * 17) % 18; px(x, 60 - h, '#5a4430', 3, h); for (let j = -6; j <= 6; j++) px(x + j, 60 - h - Math.abs(j) * 0.3, '#3f6a32', 1, 4); }   // swamp trees
+  px(0, 70, '#3a2a1c', 160, 30); for (let y = 72; y < 100; y += 4) px(0, y, '#2e2116', 160, 1);                          // peat layers below
+  for (let k = 0; k < 12; k++) px((k * 37 + t / 60) % 160, 64 + (k % 3), '#9ac0c8', 2, 1);                               // pools of water
+  g.fillStyle = '#efe4d0'; g.font = '7px Silkscreen, monospace'; g.fillText('PEAT', 4, 96);
+}
+function roof(t) {
+  px(0, 0, '#5a5048', 160, 34); for (let k = 0; k < 40; k++) px((k * 41) % 160, (k * 13) % 30, '#6a6058', 3, 1);            // shale roof
+  // fossil stumps and a fallen trunk, seen from below
+  [[22, 18], [70, 12], [122, 20]].forEach(([x, w]) => { g.fillStyle = '#7a6a52'; g.beginPath(); g.ellipse(x, 28, w / 2, 5, 0, 0, 2 * Math.PI); g.fill(); for (let a = 0; a < 6.28; a += 0.5) px(x + Math.cos(a) * w / 2.6, 28 + Math.sin(a) * 3.6, '#5a4a36'); });
+  px(30, 6, '#7a6a52', 80, 5); for (let x = 32; x < 108; x += 4) px(x, 7 + (x % 8 ? 0 : 1), '#5a4a36', 2, 2);
+  px(0, 34, '#141110', 160, 10);                                                                                           // the coal seam, mined out
+  px(0, 44, '#2a2420', 160, 56); px(0, 86, '#3a322a', 160, 14);
+  for (let x = 6; x < 160; x += 40) { px(x, 44, '#6b4a2e', 3, 42); }
+  person(78, 58, '#c4782a', '#2a2a2a'); px(78, 56, '#e8c84a', 6, 2);                                                   // a palaeobotanist with a hard hat
+  g.fillStyle = 'rgba(255,230,150,0.18)'; g.beginPath(); g.moveTo(81, 57); g.lineTo(60, 26); g.lineTo(100, 26); g.fill();  // headlamp on the roof
+  px(88, 64, '#efe4d0', 5, 6); px(89, 65, '#8a7a62', 3, 1); px(89, 67, '#8a7a62', 3, 1);                              // a notebook
+  const gl = Math.floor(t / 600) % 2; if (gl) px(70, 26, '#fff');
+}
+function datacenter(t) {
+  px(0, 0, '#6a7a5a', 160, 22); px(0, 22, '#3a2e24', 160, 78);                                                              // the surface, then rock
+  px(18, 4, '#5a4a3a', 18, 18); px(22, 0, '#4a3a2a', 3, 6); px(24, 22, '#2a2018', 6, 40);                                     // old headframe and shaft
+  px(10, 62, '#1d2a3a', 140, 30);                                                                                           // a cool chamber
+  for (let k = 0; k < 6; k++) { const x = 20 + k * 21; px(x, 66, '#2a2e36', 12, 22); for (let r = 0; r < 5; r++) px(x + 2, 69 + r * 4, Math.floor(t / 200 + k * 3 + r) % 4 ? '#5aff8a' : '#2a6a3a', 1, 1); }   // server racks
+  for (let x = 10; x < 150; x += 3) px(x, 92 + Math.sin(t / 300 + x / 8), '#3a7ab0', 2, 2);                                // cool mine water
+  px(130, 30, '#3a7ab0', 3, 34); px(110, 30, '#c4782a', 3, 34);                                                             // pipes: cool water down, warmth up
+  for (let k = 0; k < 4; k++) { px(111, 60 - ((t / 40 + k * 9) % 30), '#ffb070'); px(131, 32 + ((t / 40 + k * 9) % 30), '#9ad0ff'); }
+  px(100, 8, '#e8d8b8', 40, 14); px(104, 4, '#b04a2a', 32, 4);                                                              // a house above, warmed by it
+}
+function shaft(t) {
+  const L = [['#b8b0a0', 'LIMESTONE'], ['#6a6a64', 'SHALE'], ['#141110', 'COAL'], ['#8a7a6a', 'UNDERCLAY'], ['#c4a46a', 'SANDSTONE'], ['#b0a890', 'LIMESTONE'], ['#5a5a54', 'SHALE'], ['#141110', 'COAL'], ['#8a7a6a', 'UNDERCLAY']];
+  px(0, 0, '#6a7a5a', 160, 10); let y = 10; const th = 10;
+  L.forEach(([c], k) => { px(0, y + k * th, c, 160, th); for (let x = 0; x < 160; x += 7) px(x + (k * 3) % 7, y + k * th + 3, 'rgba(0,0,0,0.15)', 3, 1); });
+  px(64, 0, '#120e0a', 32, 100);                                                                                            // the shaft
+  for (let k = 0; k < L.length; k++) { px(62, y + k * th, L[k][0], 2, th); px(96, y + k * th, L[k][0], 2, th); }          // freshly chipped walls
+  for (let k = 0; k < 14; k++) { const hx = k % 2 ? 93 : 66, hy = 14 + k * 6; px(hx, hy, ['#d0713a', '#8a9a52', '#d0a24a'][k % 3], 2, 2); }   // climbing holds
+  // a counterweight lift: two riders going down over a pulley bring one person up
+  const u = (t % 12000) / 12000, k2 = u < 0.5 ? u * 2 : 2 - u * 2, cyD = 4 + k2 * 70, cyU = 74 - k2 * 70;
+  g.fillStyle = '#8a8a8a'; g.beginPath(); g.arc(80, 4, 5, 0, 2 * Math.PI); g.fill(); px(79, 3, '#3a3a3a', 2, 2);             // the pulley at the top of the shaft
+  px(75, 4, '#e8e0c8', 1, cyD); px(85, 4, '#e8e0c8', 1, cyU);
+  const rider = (x, y, c) => { px(x, y, '#e8c84a', 5, 2); px(x, y + 2, SKIN, 5, 3); px(x - 1, y + 5, c, 7, 6); px(x, y + 11, '#3b4a5c', 2, 4); px(x + 3, y + 11, '#3b4a5c', 2, 4); };
+  rider(73, cyD, '#d0713a'); rider(73, cyD + 15, '#8a9a52');                                                               // two riding down
+  rider(83, cyU, '#d0a24a');                                                                                               // one riding up
+  const a = Math.floor(t / 300) % 2; px(a ? 66 : 68, 30 + (t / 90) % 40, SKIN, 2, 2);                                       // a climber on the holds
+  person(108, 46, '#c4782a', '#2a2a2a'); px(108, 44, '#e8c84a', 6, 2); px(102, 52, '#8a8a8a', 6, 1);                      // a stratigrapher on a ledge, chipping
+  if (Math.floor(t / 250) % 2) px(99, 51, '#fff');
+  px(100, 58, '#4a3a2a', 24, 2);
+  for (let k = 0; k < 5; k++) { const bx = 106 + k * 4, by = 12; px(bx, by, '#2a2420', 2, 3); px(bx - 1, by, '#2a2420', 1, 1); px(bx + 2, by, '#2a2420', 1, 1); }   // a cluster of hibernating bats, left alone
+  for (let k = 0; k < 2; k++) { const fx = 120 + Math.sin(t / 500 + k * 2) * 18, fy = 26 + Math.cos(t / 330 + k) * 6, w = Math.floor(t / 90 + k) % 2; px(fx, fy, '#2a2420', 2, 1); px(fx - 2, fy - w, '#2a2420', 2, 1); px(fx + 2, fy - w, '#2a2420', 2, 1); }
+  g.fillStyle = '#efe4d0'; g.font = '6px Silkscreen, monospace'; L.forEach(([, n], k) => { if (k % 2 === 0 || n === 'COAL') g.fillText(n, 2, y + k * th + 7); });
+}
+const SCENES = { shaft, peatnow, roof, datacenter,  swamp, bury, coalball, pangaea, miners, smog, plant, family: kitchen };
+function frame(now) {
+  const el = now - t0; g.clearRect(0, 0, 160, 100);
+  if (QI < 0) title(now);
+  else { const x = Q[QI]; if (el < 1400 && x.scene !== 'family') kitchen(now); else SCENES[x.scene](now);
+    if (el < 220) { for (let k = 0; k < 700; k++) px(Math.random() * 160, Math.random() * 100, Math.random() < 0.5 ? '#fff' : '#555'); }   // a burst of static between scenes
+    const say = el < 1400 && x.scene !== 'family' ? `"${x.q}"` : x.cap; $('cap').textContent = say; }
+  if (QI < 0) $('cap').textContent = filmCap(now);
+  const c = $('tv'), r = c.getBoundingClientRect(), d = Math.min(devicePixelRatio || 1, 2), W2 = Math.round(r.width * d), H2 = Math.round(r.width * 100 / 160 * d);
+  if (c.width !== W2 || c.height !== H2) { c.width = W2; c.height = H2; }
+  const cx = c.getContext('2d'); cx.imageSmoothingEnabled = false; cx.drawImage(off, 0, 0, W2, H2);
+  requestAnimationFrame(frame);
+}
+
+// ================= the rank ladder =================
+const RANK = [['Peat', '#6b4f2e', '50–60% carbon', 'Wet, spongy, plant bits you can see. Still forming today in bogs and fens.'],
+  ['Lignite', '#5a4228', '60–70%', 'Brown coal: soft, crumbly, lots of water.'],
+  ['Sub-bituminous', '#3e3122', '70–76%', 'Dull black, still fairly wet.'],
+  ['Bituminous', '#26231f', '76–86%', 'The common black coal of the Carboniferous coalfields.'],
+  ['Anthracite', '#141312', '86–98%', 'Hard and shiny; cooked hottest, burns cleanest.'],
+  ['Graphite', '#2b2e33', 'nearly 100%', 'Past coal entirely: pure carbon, like pencil "lead".']];
+$('rank').innerHTML = RANK.map(([n, c, p, d]) => `<div style="background:${c}"><span><b>${n}</b>${p}</span><span>${d}</span></div>`).join('');
+
+// ================= the timeline =================
+const EV = [[-359e6, 'The Carboniferous begins: land plants spread into vast lowland swamps.'], [-323e6, 'The Pennsylvanian: the great coal swamps of Euramerica, with giant lycopsids, calamites, tree ferns and cordaites.'],
+  [-305e6, 'The swamps shrink as the climate dries; tree ferns take over from the lycopsids.'], [-299e6, 'The Carboniferous ends.'], [-66e6, 'Dinosaurs (but not birds) die out. Some lignites and coals of the American West are about this age.'],
+  [-3000, 'People in China are already using coal; it is burned for heat and metalwork across the ancient world.'], [1306, 'A royal proclamation tries to ban burning "sea coal" in London because of the smoke.'],
+  [1712, 'The first practical steam engine pumps water out of a coal mine.'], [1842, 'Britain bans women and children under ten from working underground.'], [1921, 'About 10,000 miners march at Blair Mountain, West Virginia.'],
+  [1952, 'The Great Smog of London.'], [1969, 'The US Federal Coal Mine Health and Safety Act.'], [2008, 'US coal production peaks.'], [2024, 'The UK closes its last coal power station.']];
+// position: a stretched scale so deep time and recent centuries both fit (log of years before present)
+const NOW = 2026, ybp = y => y < 0 ? -y : NOW - y + 1, pos = y => 1 - Math.log10(ybp(y)) / Math.log10(4e8);
+function fitT() { const c = $('cTime'), r = c.getBoundingClientRect(), d = Math.min(devicePixelRatio || 1, 2), h = 120; if (c.width !== Math.round(r.width * d)) { c.width = Math.round(r.width * d); c.height = h * d; c.style.height = h + 'px'; } const g2 = c.getContext('2d'); g2.setTransform(d, 0, 0, d, 0, 0); return { g2, w: r.width, h }; }
+function drawTime() {
+  const { g2, w, h } = fitT(), L = 12, pw = w - 24, X = y => L + pos(y) * pw, s = +$('tl').value / 1000; g2.clearRect(0, 0, w, h);
+  const grad = g2.createLinearGradient(L, 0, L + pw, 0); grad.addColorStop(0, '#2f6a2a'); grad.addColorStop(0.35, '#6b4f2e'); grad.addColorStop(0.9, '#26231f'); grad.addColorStop(1, '#c4500a');
+  g2.fillStyle = grad; g2.fillRect(L, 52, pw, 14);
+  g2.font = '400 15px VT323, monospace'; g2.fillStyle = tok('--muted'); g2.textAlign = 'center';
+  [[-3e8, '300 million years ago'], [-1e6, '1 million'], [-1000, ''], [1000, 'AD 1000'], [2000, '2000']].forEach(([y, t]) => { const x = X(y); g2.fillRect(x, 66, 1, 6); if (t) g2.fillText(t, x, 86); });
+  let best = 0, bd = 9; EV.forEach(([y], i) => { const d2 = Math.abs(pos(y) - s); if (d2 < bd) { bd = d2; best = i; } });
+  EV.forEach(([y], i) => { const x = X(y); g2.fillStyle = i === best ? tok('--accent') : tok('--gold'); g2.beginPath(); g2.arc(x, 46, i === best ? 6 : 3.5, 0, 2 * Math.PI); g2.fill(); });
+  const xs = L + s * pw; g2.strokeStyle = tok('--ink'); g2.lineWidth = 2; g2.beginPath(); g2.moveTo(xs, 30); g2.lineTo(xs, 70); g2.stroke();
+  const [y, txt] = EV[best]; $('tlV').textContent = y < 0 ? (ybp(y) >= 1e6 ? `${Math.round(ybp(y) / 1e6)} million years ago` : `${ybp(y).toLocaleString()} years ago`) : `AD ${y}`; $('tlRead').textContent = txt;
+}
+$('tl').addEventListener('input', drawTime); window.addEventListener('resize', drawTime);
+try { new MutationObserver(drawTime).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] }); } catch (e) {}
+drawTime(); requestAnimationFrame(frame);
+})();
+</script>
+</body></html>
